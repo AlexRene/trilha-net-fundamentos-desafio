@@ -8,10 +8,10 @@ decimal precoPorHora = 0;
 
 Console.WriteLine("Seja bem vindo ao sistema de estacionamento!\n" +
                   "Digite o preço inicial:");
-precoInicial = Convert.ToDecimal(Console.ReadLine());
+precoInicial = LerDecimal("preço inicial");
 
 Console.WriteLine("Agora digite o preço por hora:");
-precoPorHora = Convert.ToDecimal(Console.ReadLine());
+precoPorHora = LerDecimal("preço por hora");
 
 // Instancia a classe Estacionamento, já com os valores obtidos anteriormente
 Estacionamento es = new Estacionamento(precoInicial, precoPorHora);
@@ -52,8 +52,43 @@ while (exibirMenu)
             break;
     }
 
-    Console.WriteLine("Pressione uma tecla para continuar");
+    Console.WriteLine("Pressione Enter para continuar");
     Console.ReadLine();
 }
 
 Console.WriteLine("O programa se encerrou");
+
+// Método auxiliar para parsing robusto de números decimais
+// Aceita tanto vírgula quanto ponto como separador decimal
+static decimal LerDecimal(string nomeCampo)
+{
+    while (true)
+    {
+        string entrada = Console.ReadLine();
+        
+        if (string.IsNullOrWhiteSpace(entrada))
+        {
+            Console.WriteLine($"Por favor, digite um valor válido para {nomeCampo}:");
+            continue;
+        }
+
+        // Normalizar entrada: substituir vírgula por ponto para parsing consistente
+        string entradaNormalizada = entrada.Replace(',', '.');
+        
+        // Tentar parse usando cultura invariante (sempre usa ponto como separador)
+        if (decimal.TryParse(entradaNormalizada, 
+            System.Globalization.NumberStyles.Any, 
+            System.Globalization.CultureInfo.InvariantCulture, 
+            out decimal resultado))
+        {
+            if (resultado < 0)
+            {
+                Console.WriteLine($"O {nomeCampo} não pode ser negativo. Digite novamente:");
+                continue;
+            }
+            return resultado;
+        }
+        
+        Console.WriteLine($"Valor inválido para {nomeCampo}. Digite um número válido (ex: 5,50 ou 5.50):");
+    }
+}
